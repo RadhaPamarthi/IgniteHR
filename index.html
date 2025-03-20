@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HR Portal Dashboard</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- Babel for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Note: The Lucide icons will be created manually instead of using the library -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+    const { useState } = React;
+    
+    // Create simple icon components manually
+    const Clock = (props) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}>
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+    );
+    
+    const Calendar = (props) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}>
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+        <line x1="16" y1="2" x2="16" y2="6" />
+        <line x1="8" y1="2" x2="8" y2="6" />
+        <line x1="3" y1="10" x2="21" y2="10" />
+      </svg>
+    );
+    
+    const CheckSquare = (props) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}>
+        <polyline points="9 11 12 14 22 4" />
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+      </svg>
+    );
+    
+    const DollarSign = (props) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}>
+        <line x1="12" y1="1" x2="12" y2="23" />
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+      </svg>
+    );
+    
+    const Home = (props) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}>
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <polyline points="9 22 9 12 15 12 15 22" />
+      </svg>
+    );
+    
+    const User = (props) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}>
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </svg>
+    );
+    
+    const Settings = (props) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}>
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+      </svg>
+    );
+    
+    const Menu = (props) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}>
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    );
+    
+    const X = (props) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}>
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    );
+    
+    const Bell = (props) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}>
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+      </svg>
+    );
+
+    const EmployeeDashboard = () => {
+      const [sidebarOpen, setSidebarOpen] = useState(true);
+      const [activeTab, setActiveTab] = useState('dashboard');
+      
+      // Mock data for dashboard
+      const dashboardData = {
+        timeTracking: {
+          hoursToday: 7.5,
+          hoursThisWeek: 32.5,
+          hoursThisMonth: 142,
+          overtimeHours: 4.5
+        },
+        leaves: {
+          remaining: 15,
+          used: 5,
+          pending: 2
+        },
+        approvals: [
+          { id: 1, type: 'Leave', status: 'Pending', requestedOn: '2025-02-25' },
+          { id: 2, type: 'Expense', status: 'Approved', requestedOn: '2025-02-20' },
+          { id: 3, type: 'Training', status: 'Rejected', requestedOn: '2025-02-15' }
+        ],
+        payroll: {
+          lastPayment: {
+            date: '2025-02-28',
+            amount: '$3,250.00',
+            status: 'Paid'
+          },
+          ytdEarnings: '$9,750.00',
+          nextPaymentDate: '2025-03-15'
+        }
+      };
+      
+      const toggleSidebar = () => {
+        setSidebarOpen(!sidebarOpen);
+      };
+      
+      // Function to render content based on active tab
+      const renderContent = () => {
+        switch (activeTab) {
+          case 'dashboard':
+            return <DashboardContent data={dashboardData} />;
+          case 'timeTracking':
+            return <TimeTrackingContent data={dashboardData.timeTracking} />;
+          case 'leaves':
+            return <LeavesContent data={dashboardData.leaves} />;
+          case 'approvals':
+            return <ApprovalsContent data={dashboardData.approvals} />;
+          case 'payroll':
+            return <PayrollContent data={dashboardData.payroll} />;
+          default:
+            return <DashboardContent data={dashboardData} />;
+        }
+      };
+      
+      return (
+        <div className="flex h-screen bg-gray-50">
+          {/* Sidebar */}
+          <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-gray-900 text-white transition-all duration-300 ease-in-out fixed h-full z-10`}>
+            <div className="flex items-center justify-between p-4 border-b border-gray-700">
+              {sidebarOpen ? (
+                <h1 className="text-xl font-bold">HR Portal</h1>
+              ) : (
+                <h1 className="text-xl font-bold">HR</h1>
+              )}
+              <button onClick={toggleSidebar} className="text-gray-400 hover:text-white transition-colors duration-200 focus:outline-none">
+                {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+            </div>
+            
+            <nav className="mt-6">
+              <SidebarItem 
+                icon={<Home size={20} />} 
+                title="Dashboard" 
+                isOpen={sidebarOpen} 
+                active={activeTab === 'dashboard'} 
+                onClick={() => setActiveTab('dashboard')} 
+              />
+              <SidebarItem 
+                icon={<Clock size={20} />} 
+                title="Time Tracking" 
+                isOpen={sidebarOpen} 
+                active={activeTab === 'timeTracking'} 
+                onClick={() => setActiveTab('timeTracking')} 
+              />
+              <SidebarItem 
+                icon={<Calendar size={20} />} 
+                title="Leaves" 
+                isOpen={sidebarOpen} 
+                active={activeTab === 'leaves'} 
+                onClick={() => setActiveTab('leaves')} 
+              />
+              <SidebarItem 
+                icon={<CheckSquare size={20} />} 
+                title="Approvals" 
+                isOpen={sidebarOpen} 
+                active={activeTab === 'approvals'} 
+                onClick={() => setActiveTab('approvals')} 
+              />
+              <SidebarItem 
+                icon={<DollarSign size={20} />} 
+                title="Payroll" 
+                isOpen={sidebarOpen} 
+                active={activeTab === 'payroll'} 
+                onClick={() => setActiveTab('payroll')} 
+              />
+              <div className="border-t border-gray-700 my-4"></div>
+              <SidebarItem 
+                icon={<User size={20} />} 
+                title="Profile" 
+                isOpen={sidebarOpen} 
+                active={activeTab === 'profile'} 
+                onClick={() => setActiveTab('profile')} 
+              />
+              <SidebarItem 
+                icon={<Settings size={20} />} 
+                title="Settings" 
+                isOpen={sidebarOpen} 
+                active={activeTab === 'settings'} 
+                onClick={() => setActiveTab('settings')} 
+              />
+            </nav>
+          </div>
+          
+          {/* Main Content */}
+          <div className={`flex-1 ${sidebarOpen ? 'ml-64' : 'ml-20'} transition-all duration-300 ease-in-out`}>
+            {/* Header */}
+            <header className="bg-white shadow h-16 flex items-center justify-between px-6">
+              <h2 className="text-xl font-semibold text-gray-800">{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h2>
+              <div className="flex items-center space-x-4">
+                <button className="p-1 relative hover:bg-gray-100 rounded-full transition-colors duration-200">
+                  <Bell size={20} className="text-gray-600" />
+                  <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+                </button>
+                <div className="flex items-center space-x-2">
+                  <div className="h-8 w-8 rounded-full bg-emerald-600 flex items-center justify-center text-white font-medium shadow-sm">
+                    R
+                  </div>
+                  <span className="font-medium text-gray-700">Rolex</span>
+                </div>
+              </div>
+            </header>
+            
+            {/* Page Content */}
+            <main className="p-6">
+              {renderContent()}
+            </main>
+          </div>
+        </div>
+      );
+    };
+
+    // Sidebar Item Component
+    function SidebarItem({ icon, title, isOpen, active, onClick }) {
+      return (
+        <button 
+          onClick={onClick}
+          className={`flex items-center w-full py-3 px-4 ${
+            active ? 'bg-gray-800 border-l-4 border-emerald-500' : 'hover:bg-gray-800 border-l-4 border-transparent'
+          } transition-all duration-200`}
+        >
+          <span className={`${active ? 'text-emerald-400' : 'text-gray-400 group-hover:text-white'}`}>
+            {icon}
+          </span>
+          {isOpen && (
+            <span className={`ml-4 ${active ? 'text-white' : 'text-gray-300'} font-medium`}>
+              {title}
+            </span>
+          )}
+        </button>
+      );
+    }
+
+    // Dashboard Content Component
+    function DashboardContent({ data }) {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Time Tracking Summary */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium text-gray-900">Time Tracking</h3>
+              <div className="p-2 bg-gray-100 rounded-full">
+                <Clock className="text-gray-700" size={18} />
+              </div>
+            </div>
+            <p className="mt-2 text-3xl font-bold text-gray-800">{data.timeTracking.hoursToday}h</p>
+            <p className="text-sm text-gray-500">Today's hours</p>
+            <div className="mt-4 flex justify-between text-sm text-gray-600">
+              <p>This Week: {data.timeTracking.hoursThisWeek}h</p>
+              <p>Month: {data.timeTracking.hoursThisMonth}h</p>
+            </div>
+          </div>
+          
+          {/* Rest of your code continues... */}
+          {/* Leave Balance */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium text-gray-900">Leave Balance</h3>
+              <div className="p-2 bg-emerald-100 rounded-full">
+                <Calendar className="text-emerald-700" size={18} />
+              </div>
+            </div>
+            <p className="mt-2 text-3xl font-bold text-emerald-600">{data.leaves.remaining}</p>
+            <p className="text-sm text-gray-500">Days available</p>
+            <div className="mt-4 flex justify-between text-sm text-gray-600">
+              <p>Used: {data.leaves.used} days</p>
+              <p>Pending: {data.leaves.pending}</p>
+            </div>
+          </div>
+          
+          {/* Pending Approvals */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium text-gray-900">Approvals</h3>
+              <div className="p-2 bg-amber-100 rounded-full">
+                <CheckSquare className="text-amber-700" size={18} />
+              </div>
+            </div>
+            <p className="mt-2 text-3xl font-bold text-amber-600">{data.approvals.filter(a => a.status === 'Pending').length}</p>
+            <p className="text-sm text-gray-500">Pending requests</p>
+            <div className="mt-4 flex justify-between text-sm text-gray-600">
+              <p>Approved: {data.approvals.filter(a => a.status === 'Approved').length}</p>
+              <p>Rejected: {data.approvals.filter(a => a.status === 'Rejected').length}</p>
+            </div>
+          </div>
+          
+          {/* Payroll Info */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium text-gray-900">Payroll</h3>
+              <div className="p-2 bg-gray-100 rounded-full">
+                <DollarSign className="text-gray-700" size={18} />
+              </div>
+            </div>
+            <p className="mt-2 text-3xl font-bold text-gray-800">{data.payroll.lastPayment.amount}</p>
+            <p className="text-sm text-gray-500">Last payment</p>
+            <div className="mt-4 flex justify-between text-sm text-gray-600">
+              <p>YTD: {data.payroll.ytdEarnings}</p>
+              <p>Next: {data.payroll.nextPaymentDate}</p>
+            </div>
+          </div>
+          
+          {/* Recent Activity */}
+          <div className="col-span-1 md:col-span-2 lg:col-span-4 bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300 mt-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
+              <button className="text-sm text-emerald-600 hover:text-emerald-800 font-medium transition-colors duration-200">
+                View All
+              </button>
+            </div>
+            <div className="space-y-4">
+              {data.approvals.map(approval => (
+                <div key={approval.id} className="flex items-center justify-between pb-3 border-b border-gray-100 hover:bg-gray-50 p-2 -mx-2 rounded transition-colors duration-200">
+                  <div>
+                    <p className="font-medium text-gray-800">{approval.type} Request</p>
+                    <p className="text-sm text-gray-500">Requested on {approval.requestedOn}</p>
+                  </div>
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    approval.status === 'Approved' ? 'bg-emerald-100 text-emerald-800' :
+                    approval.status === 'Rejected' ? 'bg-red-100 text-red-800' :
+                    'bg-amber-100 text-amber-800'
+                  }`}>
+                    {approval.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Time Tracking Content
+    function TimeTrackingContent({ data }) {
+      return (
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-medium text-gray-900">Time Tracking Details</h3>
+            <button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-2">
+              <Clock size={16} />
+              <span>Clock In/Out</span>
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="p-5 bg-gray-50 rounded-lg border border-gray-100 hover:border-emerald-300 transition-colors duration-200">
+              <p className="text-sm text-gray-600 font-medium">Today</p>
+              <p className="text-2xl font-bold text-gray-900">{data.hoursToday}h</p>
+            </div>
+            <div className="p-5 bg-gray-50 rounded-lg border border-gray-100 hover:border-emerald-300 transition-colors duration-200">
+              <p className="text-sm text-gray-600 font-medium">This Week</p>
+              <p className="text-2xl font-bold text-gray-900">{data.hoursThisWeek}h</p>
+            </div>
+            <div className="p-5 bg-gray-50 rounded-lg border border-gray-100 hover:border-emerald-300 transition-colors duration-200">
+              <p className="text-sm text-gray-600 font-medium">This Month</p>
+              <p className="text-2xl font-bold text-gray-900">{data.hoursThisMonth}h</p>
+            </div>
+            <div className="p-5 bg-gray-50 rounded-lg border border-gray-100 hover:border-emerald-300 transition-colors duration-200">
+              <p className="text-sm text-gray-600 font-medium">Overtime</p>
+              <p className="text-2xl font-bold text-gray-900">{data.overtimeHours}h</p>
+            </div>
+          </div>
+          
+          <div className="border-t border-gray-200 pt-6">
+            <h4 className="text-lg font-medium text-gray-900 mb-4">Weekly Breakdown</h4>
+            {/* This would be a chart in a real implementation */}
+            <div className="h-64 bg-gray-100 rounded flex items-center justify-center">
+              <p className="text-gray-500">Time tracking chart would appear here</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Leaves Content
+    function LeavesContent({ data }) {
+      return (
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-xl font-medium text-gray-900 mb-6">Leave Management</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="p-4 bg-green-50 rounded-lg">
+              <p className="text-sm text-green-800">Available</p>
+              <p className="text-2xl font-bold text-green-900">{data.remaining} days</p>
+            </div>
+            <div className="p-4 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-800">Used</p>
+              <p className="text-2xl font-bold text-blue-900">{data.used} days</p>
+            </div>
+            <div className="p-4 bg-amber-50 rounded-lg">
+              <p className="text-sm text-amber-800">Pending Approval</p>
+              <p className="text-2xl font-bold text-amber-900">{data.pending} requests</p>
+            </div>
+          </div>
+          
+          <div className="border-t border-gray-200 pt-6">
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="text-lg font-medium text-gray-900">Leave History</h4>
+              <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
+                Request Leave
+              </button>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">From</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">To</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Annual</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-01-15</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-01-18</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Approved</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Sick</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-02-10</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-02-10</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Approved</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Annual</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-03-20</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-03-25</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">6</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 py-1 text-xs rounded-full bg-amber-100 text-amber-800">Pending</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Approvals Content
+    function ApprovalsContent({ data }) {
+      return (
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-xl font-medium text-gray-900 mb-6">Approval Requests</h3>
+          
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request Type</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Requested On</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {data.map(approval => (
+                  <tr key={approval.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{approval.type} Request</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{approval.requestedOn}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 text-xs rounded-full ${
+                        approval.status === 'Approved' ? 'bg-green-100 text-green-800' :
+                        approval.status === 'Rejected' ? 'bg-red-100 text-red-800' :
+                        'bg-amber-100 text-amber-800'
+                      }`}>
+                        {approval.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-indigo-600 hover:text-indigo-900">
+                      <a href="#">View Details</a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // Payroll Content
+    function PayrollContent({ data }) {
+      return (
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-xl font-medium text-gray-900 mb-6">Payroll Information</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="p-4 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-800">Last Payment</p>
+              <p className="text-2xl font-bold text-blue-900">{data.lastPayment.amount}</p>
+              <p className="text-xs text-blue-600 mt-1">{data.lastPayment.date}</p>
+            </div>
+            <div className="p-4 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-800">YTD Earnings</p>
+              <p className="text-2xl font-bold text-blue-900">{data.ytdEarnings}</p>
+            </div>
+            <div className="p-4 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-800">Next Payment</p>
+              <p className="text-2xl font-bold text-blue-900">{data.nextPaymentDate}</p>
+            </div>
+          </div>
+          
+          <div className="border-t border-gray-200 pt-6">
+            <h4 className="text-lg font-medium text-gray-900 mb-4">Payment History</h4>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gross</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Feb 2025</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-02-28</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$4,166.67</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$3,250.00</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Paid</span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-indigo-600 hover:text-indigo-900">
+                      <a href="#">View Slip</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Jan 2025</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-01-31</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$4,166.67</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$3,250.00</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Paid</span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-indigo-600 hover:text-indigo-900">
+                      <a href="#">View Slip</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Dec 2024</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-12-31</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$4,166.67</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$3,250.00</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Paid</span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-indigo-600 hover:text-indigo-900">
+                      <a href="#">View Slip</a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Render the app
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<EmployeeDashboard />);
+  </script>
+</body>
+</html>
